@@ -1,0 +1,33 @@
+#pragma once
+
+#include "Location.hpp"
+#include <vector>
+#include <string>
+#include <utility>
+
+class CityMap {
+public:
+    CityMap();
+
+    void printCity() const;
+
+    // Returns {path, totalCost}
+    // path = vector of location names from start to end
+    // totalCost = total travel time in minutes
+    // If no path exists, return {{}, -1}
+    std::pair<std::vector<std::string>, int> greedyPath(int start, int end);
+    std::pair<std::vector<std::string>, int> dijkstraPath(int start, int end);
+    std::pair<std::vector<std::string>, int> aStarPath(int start, int end);
+
+private:
+    std::vector<Location> locations;
+
+    // Returns Euclidean distance between two locations' coordinates, truncated to int
+    // Used as the admissible heuristic for A*
+    int heuristic(int from, int to) const;
+
+    // Traces back through prev[] to build a vector of location names
+    // Returns empty vector if no path exists
+    std::vector<std::string> reconstructPath(const std::vector<int>& prev,
+                                             int start, int end) const;
+};
