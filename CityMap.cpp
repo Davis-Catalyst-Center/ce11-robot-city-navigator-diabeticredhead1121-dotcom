@@ -58,6 +58,7 @@ std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end)
     }
 
     std::vector<std::string> visited;
+    std::vector<int> prev;
 
 
     int current = start;
@@ -69,13 +70,39 @@ std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end)
         int bestNeighbor = -1;
         int bestWeight = 100000000;
 
+        bool inVisited = false;
+
         for (std::vector<int> neighbor : locations[current].neighbors) {
-            if (locations[neighbor[0]].name && neighbor[1] < bestWeight) {
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited[i] == locations[neighbor[0]].name) {
+                    inVisited = true;
+                    continue;
+                }
+            }
+
+            if (inVisited && neighbor[1] < bestWeight) {
                 bestWeight = neighbor[1];
-                bestNeighbor = neighbor
+                bestNeighbor = neighbor[0];
             }
         }
+
+        if (bestNeighbor == -1) {
+            std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
+            return result;
+        }
+
+        prev[bestNeighbor] = current;
+
+        totalCost = totalCost + bestWeight;
+
+        current = bestNeighbor;
+
+        visited.push_back(locations[current].name);
     }
+
+    path = reconstructPath(prev, start, end);
+
+    return path, totalCost;
 };
 
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
