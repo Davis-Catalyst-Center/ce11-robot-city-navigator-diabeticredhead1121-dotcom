@@ -1,5 +1,6 @@
 #include "CityMap.hpp"
 #include <iostream>
+#include <climits>
 
 CityMap::CityMap() {
     locations.resize(8);
@@ -106,6 +107,18 @@ std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end)
 };
 
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
+    if (start == end) {
+        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
+        return result;
+    }
+
+    std::vector<int> dist;
+    std::vector<int> prev;
+    std::vector<std::string> visited;
+
+    dist[start] = 0;
+
+    
 
 };
 
