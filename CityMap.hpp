@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <cmath>
 
 class CityMap {
 public:
@@ -24,7 +25,11 @@ private:
 
     // Returns Euclidean distance between two locations' coordinates, truncated to int
     // Used as the admissible heuristic for A*
-    int heuristic(int from, int to) const;
+    int heuristic(int from, int to) const {
+        int distance = sqrt((to.x - from.x)^2 + (to.y - from.y)^2);
+
+        return distance;
+    };
 
     // Traces back through prev[] to build a vector of location names
     // Returns empty vector if no path exists

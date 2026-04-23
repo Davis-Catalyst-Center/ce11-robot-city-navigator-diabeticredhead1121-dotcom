@@ -61,10 +61,12 @@ std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) 
 
 };
 
-int CityMap::heuristic(int from, int to) const {
-
+std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, int start, int end) const {
+    for (int i = end; i > start; i--) {
+        
+    }
 };
 
-std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, int start, int end) const {
+void CityMap::printCity() const {
 
 };

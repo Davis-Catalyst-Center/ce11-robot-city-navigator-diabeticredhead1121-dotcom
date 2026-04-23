@@ -4,8 +4,7 @@
 #include <utility>
 #include "CityMap.hpp"
 
-void printResult(const std::string& algorithm,
-                 const std::pair<std::vector<std::string>, int>& result);
+void printResult(const std::string& algorithm, const std::pair<std::vector<std::string>, int>& result);
 
 int main() {
     CityMap city;
@@ -27,7 +26,7 @@ int main() {
 
     std::cout << "\n";
 
-    std::cout << "--- Route: [Your Choice] ---\n\n";
+    std::cout << "--- Route: Suburb South -> Downtown ---\n\n";
 
     /* Pick your own start/end pair and test all three algorithms */
 
