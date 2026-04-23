@@ -52,19 +52,41 @@ void CityMap::printCity() const {
 }
 
 std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end) {
+    std::vector<std::pair<std::string, bool>> visited;
+    visited.push_back(locations[start]);
+
+    int travelTime = 0;
+    std::vector<int> nextLocation = locations[start].neighbors;
+
+    while (int i = 0; i < end - start; i++) {
+        for (std::vector neighbor : locations[start].neighbors) {
+            if (neighbor[1] < nextLocation[1]) {
+                nextLocation = neighbor;
+            }
+        }
+
+        visited.push_back(locations[nextLocation[1]]);
+    }
+
 
 };
+
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
 
 };
+
 std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
 
 };
 
 std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, int start, int end) const {
+    std::vector<std::string> path;
+
     for (int i = end; i > start; i--) {
-        
+        path.push_back(locations[i].name);
     }
+
+    return path;
 };
 
 void CityMap::printCity() const {
