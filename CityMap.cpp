@@ -52,7 +52,30 @@ void CityMap::printCity() const {
 }
 
 std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end) {
+    if (start == end) {
+        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
+        return result;
+    }
 
+    std::vector<std::string> visited;
+
+
+    int current = start;
+    int totalCost = 0;
+
+    visited.push_back(locations[current].name);
+
+    while (current != end) {
+        int bestNeighbor = -1;
+        int bestWeight = 100000000;
+
+        for (std::vector<int> neighbor : locations[current].neighbors) {
+            if (locations[neighbor[0]].name && neighbor[1] < bestWeight) {
+                bestWeight = neighbor[1];
+                bestNeighbor = neighbor
+            }
+        }
+    }
 };
 
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
