@@ -1,6 +1,6 @@
 #include "CityMap.hpp"
 #include <iostream>
-#include <climits>
+#include <limits>
 
 CityMap::CityMap() {
     locations.resize(8);
@@ -118,7 +118,12 @@ std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int en
 
     dist[start] = 0;
 
-    
+    for (int i = 0; i < locations.size() - 1; i++) {
+        current = -1;
+        int smallestDist = std::numeric_limits<double>::infinity();
+
+        for ()
+    }
 
 };
 
