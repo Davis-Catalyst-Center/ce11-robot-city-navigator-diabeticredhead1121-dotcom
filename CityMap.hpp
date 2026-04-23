@@ -28,6 +28,5 @@ private:
 
     // Traces back through prev[] to build a vector of location names
     // Returns empty vector if no path exists
-    std::vector<std::string> reconstructPath(const std::vector<int>& prev,
-                                             int start, int end) const;
+    std::vector<std::string> reconstructPath(const std::vector<int>& prev, int start, int end) const;
 };
