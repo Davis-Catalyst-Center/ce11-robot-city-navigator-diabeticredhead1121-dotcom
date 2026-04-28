@@ -122,9 +122,59 @@ std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int en
         current = -1;
         int smallestDist = std::numeric_limits<double>::infinity();
 
-        for ()
-    }
+        for (int j = 0; j < locations.size(); j++) {
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited[i] == locations[neighbor[0]].name) {
+                    inVisited = true;
+                    continue;
+                }
+            }
 
+            if (!inVisited && dist[i] < smallestDist) {
+                smallestDist = dist[i];
+                current = i;
+            }
+        }
+
+        if (current == -1) {
+            break;
+        }
+
+        visited.push_back(locations[current]);
+
+        if (current == end) {
+            break;
+        }
+
+        for (std::vector<int> neighbor : locations[current].neighbors) {
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited[i] == locations[neighbor[0]].name) {
+                    inVisited = true;
+                    continue;
+                }
+            }
+
+            if (!inVisited) {
+                weight = neighbor[1];
+                
+                newDist = dist[current] + weight;
+
+                if (newDist < dist[neighbor]) {
+                    dist[neighbor] = newDist;
+                    prev[neighbor] = current;
+                }
+            }
+        }
+     }
+
+     if (dist[end] == std::numeric_limits<double>::infinity()) {
+        return std::pair<std::vector<std::string>, int> result = {{}, -1};
+
+     }
+
+     path = reconstructPath(prev, start, end);
+
+     return {path, dist[end]};
 };
 
 std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
@@ -152,8 +202,4 @@ std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, 
     }
 
     return path;
-};
-
-void CityMap::printCity() const {
-
 };
