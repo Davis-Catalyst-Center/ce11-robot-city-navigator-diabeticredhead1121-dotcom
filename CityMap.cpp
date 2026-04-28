@@ -174,11 +174,85 @@ std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int en
 
      path = reconstructPath(prev, start, end);
 
-     return {path, dist[end]};
+     std::pair<std::vector<std::string>, int> result = {path, dist[end]};
+
+     return result;
 };
 
 std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
+    if (start == end) {
+        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
+        return result;
+    }
 
+    std::vector<int> gScore;
+    std::vector<int> fScore;
+    std::vector<int> prev;
+    std::vector<std::string> visited;
+
+    gScore[start] = 0;
+
+    fScore[start] = heuristic(start, end);
+
+    for (int i = 0; i < locations.size() - 1; i++) {
+        current = -1;
+        smallestF = std::numeric_limits<double>::infinity();
+
+        for (int j = 0; j < locations.size(); j++) {
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited[i] == locations[neighbor[0]].name) {
+                    inVisited = true;
+                    continue;
+                }
+            }
+
+            if (!inVisited && fScore[i] < smallestF) {
+                smallestF = fScore[i];
+                current = i;
+            }
+        }
+
+        if (current == -1) {
+            break;
+        }
+        else if (current == end) {
+            break;
+        }
+
+        visited.push_back(locations[current]);
+
+        for (std::vector<int> neighbor : locations[current].neighbors) {
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited[i] == locations[neighbor[0]].name) {
+                    inVisited = true;
+                    continue;
+                }
+            }
+
+            if (!inVisited) {
+                weight = neighbor[1];
+
+                hScore = gScore[current] + weight;
+
+                if (hScore < gScore[neighbor[0]]) {
+                    gScore[neighbor[0]] = hScore;
+                    prev[neighbor] = current;
+
+                    fScore[neighbor[0]] = gScore[neighbor[0]] + heuristic(neighbor, end);
+                }
+            }
+        }
+    }
+
+    if (gScore[end] == std::numeric_limits<double>::infinity()) {
+        std::pair<std::vector<std::string>, int> result = {{}, -1};
+        return result;
+    }
+
+    path = reconstructPath(prev, start, end);
+
+    std::pair<std::vector<std::string>, int> result = {path, dist[end]};
+    return result;
 };
 
 std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, int start, int end) const {
