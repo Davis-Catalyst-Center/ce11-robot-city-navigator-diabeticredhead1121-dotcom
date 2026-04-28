@@ -1,6 +1,9 @@
 #include "CityMap.hpp"
 #include <iostream>
 #include <limits>
+#include <queue>
+#include <algorithm>
+#include <tuple>
 
 CityMap::CityMap() {
     locations.resize(8);
@@ -54,226 +57,120 @@ void CityMap::printCity() const {
 
 std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end) {
     if (start == end) {
-        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
-        return result;
+        return {{locations[start].name}, 0};
     }
 
-    std::vector<std::string> visited;
-    std::vector<int> prev;
-
-
+    std::vector<int> prev(locations.size(), -1);
+    std::vector<bool> visited(locations.size(), false);
     int current = start;
     int totalCost = 0;
-
-    visited.push_back(locations[current].name);
+    visited[start] = true;
 
     while (current != end) {
         int bestNeighbor = -1;
-        int bestWeight = 100000000;
-
-        bool inVisited = false;
-
-        for (std::vector<int> neighbor : locations[current].neighbors) {
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited[i] == locations[neighbor[0]].name) {
-                    inVisited = true;
-                    continue;
-                }
-            }
-
-            if (inVisited && neighbor[1] < bestWeight) {
-                bestWeight = neighbor[1];
-                bestNeighbor = neighbor[0];
+        int bestCost = std::numeric_limits<int>::max();
+        for (auto [neighbor, cost] : locations[current].neighbors) {
+            if (!visited[neighbor] && cost < bestCost) {
+                bestCost = cost;
+                bestNeighbor = neighbor;
             }
         }
-
         if (bestNeighbor == -1) {
-            std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
-            return result;
+            return {{}, -1};
         }
-
+        visited[bestNeighbor] = true;
         prev[bestNeighbor] = current;
-
-        totalCost = totalCost + bestWeight;
-
+        totalCost += bestCost;
         current = bestNeighbor;
-
-        visited.push_back(locations[current].name);
     }
 
-    path = reconstructPath(prev, start, end);
-
-    return path, totalCost;
-};
+    std::vector<std::string> path = reconstructPath(prev, start, end);
+    return {path, totalCost};
+}
 
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
     if (start == end) {
-        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
-        return result;
+        return {{locations[start].name}, 0};
     }
 
-    std::vector<int> dist;
-    std::vector<int> prev;
-    std::vector<std::string> visited;
+    std::vector<int> dist(locations.size(), std::numeric_limits<int>::max());
+    std::vector<int> prev(locations.size(), -1);
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
 
     dist[start] = 0;
+    pq.push({0, start});
 
-    for (int i = 0; i < locations.size() - 1; i++) {
-        current = -1;
-        int smallestDist = std::numeric_limits<double>::infinity();
+    while (!pq.empty()) {
+        auto [cost, current] = pq.top();
+        pq.pop();
 
-        for (int j = 0; j < locations.size(); j++) {
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited[i] == locations[neighbor[0]].name) {
-                    inVisited = true;
-                    continue;
-                }
-            }
+        if (cost > dist[current]) continue;
 
-            if (!inVisited && dist[i] < smallestDist) {
-                smallestDist = dist[i];
-                current = i;
+        for (auto [neighbor, weight] : locations[current].neighbors) {
+            int newDist = dist[current] + weight;
+            if (newDist < dist[neighbor]) {
+                dist[neighbor] = newDist;
+                prev[neighbor] = current;
+                pq.push({newDist, neighbor});
             }
         }
+    }
 
-        if (current == -1) {
-            break;
-        }
+    if (dist[end] == std::numeric_limits<int>::max()) {
+        return {{}, -1};
+    }
 
-        visited.push_back(locations[current]);
+    std::vector<std::string> path = reconstructPath(prev, start, end);
+    return {path, dist[end]};
+}
+
+std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
+    if (start == end) {
+        return {{locations[start].name}, 0};
+    }
+
+    std::vector<int> gScore(locations.size(), std::numeric_limits<int>::max());
+    std::vector<int> fScore(locations.size(), std::numeric_limits<int>::max());
+    std::vector<int> prev(locations.size(), -1);
+    std::priority_queue<std::tuple<int, int, int>, std::vector<std::tuple<int, int, int>>, std::greater<std::tuple<int, int, int>>> pq;
+
+    gScore[start] = 0;
+    fScore[start] = heuristic(start, end);
+    pq.push({fScore[start], 0, start});
+
+    while (!pq.empty()) {
+        auto [f, g, current] = pq.top();
+        pq.pop();
 
         if (current == end) {
             break;
         }
 
-        for (std::vector<int> neighbor : locations[current].neighbors) {
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited[i] == locations[neighbor[0]].name) {
-                    inVisited = true;
-                    continue;
-                }
-            }
-
-            if (!inVisited) {
-                weight = neighbor[1];
-                
-                newDist = dist[current] + weight;
-
-                if (newDist < dist[neighbor]) {
-                    dist[neighbor] = newDist;
-                    prev[neighbor] = current;
-                }
-            }
-        }
-     }
-
-     if (dist[end] == std::numeric_limits<double>::infinity()) {
-        return std::pair<std::vector<std::string>, int> result = {{}, -1};
-
-     }
-
-     path = reconstructPath(prev, start, end);
-
-     std::pair<std::vector<std::string>, int> result = {path, dist[end]};
-
-     return result;
-};
-
-std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
-    if (start == end) {
-        std::pair<std::vector<std::string>, int> result = {{locations[start].name}, 0};
-        return result;
-    }
-
-    std::vector<int> gScore;
-    std::vector<int> fScore;
-    std::vector<int> prev;
-    std::vector<std::string> visited;
-
-    gScore[start] = 0;
-
-    fScore[start] = heuristic(start, end);
-
-    for (int i = 0; i < locations.size() - 1; i++) {
-        current = -1;
-        smallestF = std::numeric_limits<double>::infinity();
-
-        for (int j = 0; j < locations.size(); j++) {
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited[i] == locations[neighbor[0]].name) {
-                    inVisited = true;
-                    continue;
-                }
-            }
-
-            if (!inVisited && fScore[i] < smallestF) {
-                smallestF = fScore[i];
-                current = i;
-            }
-        }
-
-        if (current == -1) {
-            break;
-        }
-        else if (current == end) {
-            break;
-        }
-
-        visited.push_back(locations[current]);
-
-        for (std::vector<int> neighbor : locations[current].neighbors) {
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited[i] == locations[neighbor[0]].name) {
-                    inVisited = true;
-                    continue;
-                }
-            }
-
-            if (!inVisited) {
-                weight = neighbor[1];
-
-                hScore = gScore[current] + weight;
-
-                if (hScore < gScore[neighbor[0]]) {
-                    gScore[neighbor[0]] = hScore;
-                    prev[neighbor] = current;
-
-                    fScore[neighbor[0]] = gScore[neighbor[0]] + heuristic(neighbor, end);
-                }
+        for (auto [neighbor, weight] : locations[current].neighbors) {
+            int tentativeG = gScore[current] + weight;
+            if (tentativeG < gScore[neighbor]) {
+                gScore[neighbor] = tentativeG;
+                fScore[neighbor] = tentativeG + heuristic(neighbor, end);
+                prev[neighbor] = current;
+                pq.push({fScore[neighbor], tentativeG, neighbor});
             }
         }
     }
 
-    if (gScore[end] == std::numeric_limits<double>::infinity()) {
-        std::pair<std::vector<std::string>, int> result = {{}, -1};
-        return result;
+    if (gScore[end] == std::numeric_limits<int>::max()) {
+        return {{}, -1};
     }
 
-    path = reconstructPath(prev, start, end);
-
-    std::pair<std::vector<std::string>, int> result = {path, dist[end]};
-    return result;
-};
+    std::vector<std::string> path = reconstructPath(prev, start, end);
+    return {path, gScore[end]};
+}
 
 std::vector<std::string> CityMap::reconstructPath(const std::vector<int>& prev, int start, int end) const {
     std::vector<std::string> path;
-
-    if (start == end) {
-        path.push_back(locations[start].name);
-        return path;
+    for (int at = end; at != -1; at = prev[at]) {
+        path.push_back(locations[at].name);
+        if (at == start) break;
     }
-
-    current = end;
-
-    while (current != -1) {
-        path.push_back(locations[current].name);
-
-        if (current == start) {
-            return path;
-        }
-
-        current = prev[current];
-    }
-
+    std::reverse(path.begin(), path.end());
     return path;
-};
+}

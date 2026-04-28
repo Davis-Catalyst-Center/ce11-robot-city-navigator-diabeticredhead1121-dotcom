@@ -26,9 +26,9 @@ private:
     // Returns Euclidean distance between two locations' coordinates, truncated to int
     // Used as the admissible heuristic for A*
     int heuristic(int from, int to) const {
-        int distance = sqrt((to.x - from.x)^2 + (to.y - from.y)^2);
-
-        return distance;
+        double dx = locations[to].x - locations[from].x;
+        double dy = locations[to].y - locations[from].y;
+        return static_cast<int>(sqrt(dx * dx + dy * dy));
     };
 
     // Traces back through prev[] to build a vector of location names
