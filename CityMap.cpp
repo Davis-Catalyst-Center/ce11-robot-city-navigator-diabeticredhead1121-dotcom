@@ -56,7 +56,11 @@ void CityMap::printCity() const {
 }
 
 std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end) {
-    if (start == end) {
+    if (start < 0 || end < 0 || start >= locations.size() || end >= locations.size()) {
+        return {{}, -1};
+    }
+
+    else if (start == end) {
         return {{locations[start].name}, 0};
     }
 
@@ -89,7 +93,11 @@ std::pair<std::vector<std::string>, int> CityMap::greedyPath(int start, int end)
 }
 
 std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int end) {
-    if (start == end) {
+    if (start < 0 || end < 0 || start >= locations.size() || end >= locations.size()) {
+        return {{}, -1};
+    }
+
+    else if (start == end) {
         return {{locations[start].name}, 0};
     }
 
@@ -125,7 +133,11 @@ std::pair<std::vector<std::string>, int> CityMap::dijkstraPath(int start, int en
 }
 
 std::pair<std::vector<std::string>, int> CityMap::aStarPath(int start, int end) {
-    if (start == end) {
+    if (start < 0 || end < 0 || start >= locations.size() || end >= locations.size()) {
+        return {{}, -1};
+    }
+    
+    else if (start == end) {
         return {{locations[start].name}, 0};
     }
 
